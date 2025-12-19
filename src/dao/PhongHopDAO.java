@@ -6,9 +6,6 @@ import java.util.List;
 
 public class PhongHopDAO {
 
-    // ===============================
-    // 1. Thêm phòng (ADMIN)
-    // ===============================
     public boolean themPhong(String ma, String ten, int sucChua, double gia) {
         try (Connection c = DBConnection.getConnection()) {
             PreparedStatement ps = c.prepareStatement(
@@ -26,9 +23,7 @@ public class PhongHopDAO {
         }
     }
 
-    // ===============================
-    // 2. Lấy danh sách phòng (USER + ADMIN)
-    // ===============================
+    
     public List<String[]> getAllPhong() {
         List<String[]> list = new ArrayList<>();
         try (Connection c = DBConnection.getConnection()) {
@@ -49,9 +44,7 @@ public class PhongHopDAO {
         return list;
     }
 
-    // ===============================
-    // 3. Lấy 1 phòng theo mã
-    // ===============================
+    
     public String[] getPhongByMa(String ma) {
         try (Connection c = DBConnection.getConnection()) {
             PreparedStatement ps = c.prepareStatement(
@@ -74,9 +67,7 @@ public class PhongHopDAO {
         return null;
     }
 
-    // ===============================
-    // 4. Cập nhật phòng (ADMIN)
-    // ===============================
+    
     public boolean capNhatPhong(String ma, String ten, int sucChua, double gia) {
         try (Connection c = DBConnection.getConnection()) {
             PreparedStatement ps = c.prepareStatement(
@@ -93,9 +84,7 @@ public class PhongHopDAO {
         }
     }
 
-    // ===============================
-    // 5. Xóa phòng (ADMIN)
-    // ===============================
+    
     public boolean xoaPhong(String ma) {
         try (Connection c = DBConnection.getConnection()) {
             PreparedStatement ps = c.prepareStatement(

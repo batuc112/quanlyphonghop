@@ -26,5 +26,3 @@ public class UserDAO {
 }
 
 }
-// hello
-// hi
