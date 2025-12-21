@@ -57,22 +57,27 @@ public class DatPhongForm extends JFrame {
     }
 
     void datPhong() {
-        int row = table.getSelectedRow();
-        if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Chọn phòng trước");
-            return;
-        }
+    int row = table.getSelectedRow();
+    if (row == -1) {
+        JOptionPane.showMessageDialog(this, "Chọn phòng trước");
+        return;
+    }
 
-        String maPhong = table.getValueAt(row, 0).toString();
+    String maPhong = table.getValueAt(row, 0).toString();
 
-        new DatPhongDAO().datPhong(
-            maPhong,
-            Date.valueOf(txtNgay.getText()),
-            Time.valueOf(txtBD.getText()),
-            Time.valueOf(txtKT.getText())
-        );
+    boolean ok = new DatPhongDAO().datPhong(
+        maPhong,
+        Date.valueOf(txtNgay.getText()),
+        Time.valueOf(txtBD.getText()),
+        Time.valueOf(txtKT.getText())
+    );
 
+    if (ok) {
         JOptionPane.showMessageDialog(this, "Đặt phòng thành công");
         dispose();
+    } else {
+        JOptionPane.showMessageDialog(this, "Phòng đã có lịch trong thời gian này");
     }
+}
+
 }
