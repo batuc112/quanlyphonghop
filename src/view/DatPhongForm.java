@@ -1,83 +1,116 @@
 package view;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import dao.PhongHopDAO;
 import dao.DatPhongDAO;
+
+import javax.swing.*;
 import java.sql.Date;
 import java.sql.Time;
 
 public class DatPhongForm extends JFrame {
 
-    JTable table;
-    JTextField txtNgay = new JTextField();
-    JTextField txtBD = new JTextField();
-    JTextField txtKT = new JTextField();
+    JTextField txtNgay;
+    JComboBox<Integer> cbBDGio, cbBDPhut;
+    JComboBox<Integer> cbKTGio, cbKTPhut;
+    JButton btnDat;
 
-    public DatPhongForm() {
-        setTitle("Đặt phòng");
-        setSize(600,400);
-        setLayout(null);
+    String maPhong;
+
+    public DatPhongForm(String maPhong) {
+        this.maPhong = maPhong;
+
+        setTitle("Đặt phòng " + maPhong);
+        setSize(400,300);
         setLocationRelativeTo(null);
+        setLayout(null);
 
-        DefaultTableModel model = new DefaultTableModel(
-            new String[]{"Mã phòng","Tên","Sức chứa","Giá"}, 0
-        );
+        JLabel lbNgay = new JLabel("Ngày (yyyy-mm-dd)");
+        lbNgay.setBounds(20,20,150,25);
+        add(lbNgay);
 
-        table = new JTable(model);
-        JScrollPane sp = new JScrollPane(table);
-        sp.setBounds(20,20,540,150);
-        add(sp);
+        txtNgay = new JTextField();
+        txtNgay.setBounds(180,20,180,25);
+        add(txtNgay);
 
-        loadPhong(model);
+        // ===== Giờ bắt đầu =====
+        JLabel lbBD = new JLabel("Giờ bắt đầu");
+        lbBD.setBounds(20,60,150,25);
+        add(lbBD);
 
-        add(new JLabel("Ngày (yyyy-mm-dd)")).setBounds(20,190,150,25);
-        add(new JLabel("Giờ BD")).setBounds(20,220,150,25);
-        add(new JLabel("Giờ KT")).setBounds(20,250,150,25);
+        cbBDGio = new JComboBox<>();
+        cbBDPhut = new JComboBox<>();
 
-        txtNgay.setBounds(180,190,150,25);
-        txtBD.setBounds(180,220,150,25);
-        txtKT.setBounds(180,250,150,25);
+        for (int i = 0; i < 24; i++) cbBDGio.addItem(i);
+        for (int i = 0; i < 60; i += 5) cbBDPhut.addItem(i);
 
-        JButton btn = new JButton("Đặt phòng");
-        btn.setBounds(380,220,120,30);
+        cbBDGio.setBounds(180,60,60,25);
+        cbBDPhut.setBounds(250,60,60,25);
 
-        add(txtNgay); add(txtBD); add(txtKT);
-        add(btn);
+        add(cbBDGio);
+        add(cbBDPhut);
 
-        btn.addActionListener(e -> datPhong());
+        // ===== Giờ kết thúc =====
+        JLabel lbKT = new JLabel("Giờ kết thúc");
+        lbKT.setBounds(20,100,150,25);
+        add(lbKT);
 
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-    }
+        cbKTGio = new JComboBox<>();
+        cbKTPhut = new JComboBox<>();
 
-    void loadPhong(DefaultTableModel model) {
-        for (String[] p : new PhongHopDAO().getAllPhong()) {
-            model.addRow(p);
-        }
+        for (int i = 0; i < 24; i++) cbKTGio.addItem(i);
+        for (int i = 0; i < 60; i += 5) cbKTPhut.addItem(i);
+
+        cbKTGio.setBounds(180,100,60,25);
+        cbKTPhut.setBounds(250,100,60,25);
+
+        add(cbKTGio);
+        add(cbKTPhut);
+
+        btnDat = new JButton("Đặt phòng");
+        btnDat.setBounds(120,160,150,35);
+        add(btnDat);
+
+        btnDat.addActionListener(e -> datPhong());
+
+        setVisible(true);
     }
 
     void datPhong() {
-    int row = table.getSelectedRow();
-    if (row == -1) {
-        JOptionPane.showMessageDialog(this, "Chọn phòng trước");
-        return;
+        try {
+            Date ngay = Date.valueOf(txtNgay.getText());
+
+            String bd = String.format(
+                "%02d:%02d:00",
+                cbBDGio.getSelectedItem(),
+                cbBDPhut.getSelectedItem()
+            );
+
+            String kt = String.format(
+                "%02d:%02d:00",
+                cbKTGio.getSelectedItem(),
+                cbKTPhut.getSelectedItem()
+            );
+
+            Time gioBD = Time.valueOf(bd);
+            Time gioKT = Time.valueOf(kt);
+
+            if (!gioKT.after(gioBD)) {
+                JOptionPane.showMessageDialog(this,"Giờ kết thúc phải sau giờ bắt đầu");
+                return;
+            }
+
+            boolean ok = new DatPhongDAO().datPhong(
+                maPhong, ngay, gioBD, gioKT
+            );
+
+            JOptionPane.showMessageDialog(
+                this,
+                ok ? "Đặt phòng thành công" : "Trùng lịch, phòng đã được đặt"
+            );
+
+            if (ok) dispose();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,"Dữ liệu không hợp lệ");
+        }
     }
-
-    String maPhong = table.getValueAt(row, 0).toString();
-
-    boolean ok = new DatPhongDAO().datPhong(
-        maPhong,
-        Date.valueOf(txtNgay.getText()),
-        Time.valueOf(txtBD.getText()),
-        Time.valueOf(txtKT.getText())
-    );
-
-    if (ok) {
-        JOptionPane.showMessageDialog(this, "Đặt phòng thành công");
-        dispose();
-    } else {
-        JOptionPane.showMessageDialog(this, "Phòng đã có lịch trong thời gian này");
-    }
-}
-
 }

@@ -4,48 +4,44 @@ import java.sql.*;
 
 public class DatPhongDAO {
 
-    public boolean TrungLich(String maPhong, Date ngay, Time bd, Time kt) {
+    public boolean datPhong(String ma, Date ngay, Time bd, Time kt) {
+
+        String checkSQL =
+            "SELECT COUNT(*) FROM datphong " +
+            "WHERE ma_phong=? AND ngay=? " +
+            "AND ( (? < gio_ket_thuc) AND (? > gio_bat_dau) )";
+
+        String insertSQL =
+            "INSERT INTO datphong(ma_phong,ngay,gio_bat_dau,gio_ket_thuc) " +
+            "VALUES (?,?,?,?)";
+
         try (Connection c = DBConnection.getConnection()) {
-            PreparedStatement ps = c.prepareStatement(
-                "SELECT COUNT(*) FROM datphong " +
-                "WHERE ma_phong=? AND ngay=? " +
-                "AND (? < gio_kt AND ? > gio_bd)"
-            );
-            ps.setString(1, maPhong);
+
+            // check trùng
+            PreparedStatement ps = c.prepareStatement(checkSQL);
+            ps.setString(1, ma);
             ps.setDate(2, ngay);
             ps.setTime(3, bd);
             ps.setTime(4, kt);
 
             ResultSet rs = ps.executeQuery();
-            rs.next();
-            return rs.getInt(1) > 0; 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return true; 
-        }
-    }
+            if (rs.next() && rs.getInt(1) > 0) {
+                return false; // TRÙNG
+            }
 
-    
-    public boolean datPhong(String mp, Date ngay, Time bd, Time kt) {
-
-       
-        if (TrungLich(mp, ngay, bd, kt)) {
-            return false;
-        }
-
-        try (Connection c = DBConnection.getConnection()) {
-            PreparedStatement ps = c.prepareStatement(
-                "INSERT INTO datphong(ma_phong,ngay,gio_bd,gio_kt) VALUES(?,?,?,?)"
-            );
-            ps.setString(1, mp);
+            // insert
+            ps = c.prepareStatement(insertSQL);
+            ps.setString(1, ma);
             ps.setDate(2, ngay);
             ps.setTime(3, bd);
             ps.setTime(4, kt);
             ps.executeUpdate();
+
             return true;
+
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 }

@@ -36,6 +36,7 @@ public class ThemPhongForm extends JFrame {
         btn.addActionListener(e -> themPhong());
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        
     }
 
     void themPhong() {
@@ -52,4 +53,5 @@ public class ThemPhongForm extends JFrame {
             JOptionPane.showMessageDialog(this, "Dữ liệu không hợp lệ");
         }
     }
+    
 }
