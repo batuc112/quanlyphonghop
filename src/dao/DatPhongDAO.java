@@ -26,7 +26,7 @@ public class DatPhongDAO {
 
         try (Connection c = DBConnection.getConnection()) {
 
-            // ===== CHECK TRÙNG =====
+
             PreparedStatement psCheck = c.prepareStatement(checkSql);
             psCheck.setString(1, maPhong);
             psCheck.setDate(2, ngay);
@@ -37,20 +37,20 @@ public class DatPhongDAO {
             rs.next();
             if (rs.getInt(1) > 0) return false;
 
-            // ===== LẤY GIÁ PHÒNG =====
+
             PreparedStatement psGia = c.prepareStatement(getGiaSql);
             psGia.setString(1, maPhong);
             ResultSet rsGia = psGia.executeQuery();
             rsGia.next();
             double gia = rsGia.getDouble(1);
 
-            // ===== TÍNH SỐ GIỜ =====
+  
             long diffMs = gioKT.getTime() - gioBD.getTime();
             double soGio = diffMs / (1000.0 * 60 * 60);
 
             double tien = soGio * gia;
 
-            // ===== INSERT =====
+    
             PreparedStatement ps = c.prepareStatement(insertSql);
             ps.setString(1, maPhong);
             ps.setString(2, username);
@@ -68,7 +68,7 @@ public class DatPhongDAO {
         }
     }
 
-    // ===== KIỂM TRA PHÒNG ĐÃ CÓ LỊCH =====
+ 
     public boolean phongDaCoLich(String maPhong) {
         String sql = "SELECT COUNT(*) FROM datphong WHERE ma_phong = ?";
         try (Connection c = DBConnection.getConnection();
@@ -120,7 +120,7 @@ public class DatPhongDAO {
     }
 }
 
-    // ===== HUỶ ĐẶT PHÒNG =====
+
 public boolean huyDatPhong(int id, String username) {
     String sql = """
         DELETE FROM datphong

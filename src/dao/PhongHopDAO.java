@@ -22,7 +22,7 @@ public class PhongHopDAO {
         return list;
     }
 
-    // ➕ thêm phòng
+
     public boolean themPhong(String ma, String ten, int suc, double gia) {
         try (Connection c = DBConnection.getConnection()) {
             PreparedStatement ps = c.prepareStatement(
@@ -36,7 +36,7 @@ public class PhongHopDAO {
         } catch(Exception e){return false;}
     }
 
-    // ✏️ sửa phòng
+
     public boolean suaPhong(String ma, String ten, int suc, double gia) {
         try (Connection c = DBConnection.getConnection()) {
             PreparedStatement ps = c.prepareStatement(
@@ -50,7 +50,7 @@ public class PhongHopDAO {
         } catch(Exception e){return false;}
     }
 
-    // ❌ xóa phòng
+
     public boolean xoaPhong(String ma) {
         try (Connection c = DBConnection.getConnection()) {
             PreparedStatement ps = c.prepareStatement(

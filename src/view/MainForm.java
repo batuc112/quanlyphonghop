@@ -9,16 +9,16 @@ import java.sql.*;
 
 public class MainForm extends JFrame {
 
-    // ===== BẢNG =====
+
     JTable tblPhong, tblLich;
     DefaultTableModel modelPhong, modelLich;
 
-    // ===== ĐẶT PHÒNG =====
+
     JComboBox<Integer> cbNgay, cbThang, cbBDGio, cbBDPhut, cbKTGio, cbKTPhut;
     JTextField txtNam;
     JButton btnDat;
 
-    // ===== ROLE =====
+
     String role, username;
 
     public MainForm(String role, String username) {
@@ -30,7 +30,6 @@ public class MainForm extends JFrame {
         setLocationRelativeTo(null);
         setLayout(null);
 
-        // ================= PHÒNG =================
         modelPhong = new DefaultTableModel(
                 new String[]{"Mã", "Tên", "Sức chứa", "Giá", "Trạng thái"}, 0
         );
@@ -41,7 +40,7 @@ public class MainForm extends JFrame {
 
         loadPhong();
 
-        // ================= LỊCH PHÒNG =================
+
         modelLich = new DefaultTableModel(
                 new String[]{"Ngày", "BĐ", "KT"}, 0
         );
@@ -52,7 +51,7 @@ public class MainForm extends JFrame {
 
         tblPhong.getSelectionModel().addListSelectionListener(e -> loadLichPhong());
 
-        // ================= ĐẶT PHÒNG =================
+
         JLabel lbDate = new JLabel("Ngày / Tháng / Năm");
         lbDate.setBounds(760, 30, 200, 25);
         add(lbDate);
@@ -70,7 +69,7 @@ public class MainForm extends JFrame {
 
         add(cbNgay); add(cbThang); add(txtNam);
 
-        // ===== GIỜ =====
+
         cbBDGio = new JComboBox<>();
         cbBDPhut = new JComboBox<>();
         cbKTGio = new JComboBox<>();
@@ -102,7 +101,7 @@ public class MainForm extends JFrame {
 
         btnDat.addActionListener(e -> datPhong());
 
-        // ================= ADMIN =================
+
         if (role.equals("admin")) {
             JButton btnThem = new JButton("Thêm phòng");
             JButton btnSua = new JButton("Sửa phòng");
@@ -123,7 +122,7 @@ public class MainForm extends JFrame {
             btnBaoCao.addActionListener(e -> moBaoCao());
         }
 
-        // ================= LỊCH CÁ NHÂN =================
+
         JButton btnMy = new JButton("Lịch của tôi");
         btnMy.setBounds(760, 460, 220, 30);
         add(btnMy);
@@ -136,7 +135,7 @@ public class MainForm extends JFrame {
         setVisible(true);
     }
 
-    // ================= LOAD PHÒNG =================
+
     void loadPhong() {
         modelPhong.setRowCount(0);
         PhongHopDAO dao = new PhongHopDAO();
@@ -150,7 +149,7 @@ public class MainForm extends JFrame {
         }
     }
 
-    // ================= LỊCH PHÒNG =================
+
     void loadLichPhong() {
         modelLich.setRowCount(0);
         int row = tblPhong.getSelectedRow();
@@ -171,7 +170,7 @@ public class MainForm extends JFrame {
         } catch (Exception ignored) {}
     }
 
-    // ================= LỊCH CÁ NHÂN =================
+
     void loadLichCaNhan() {
         modelLich.setRowCount(0);
         ResultSet rs = new DatPhongDAO().lichCaNhan(username);
@@ -188,7 +187,7 @@ public class MainForm extends JFrame {
         } catch (Exception ignored) {}
     }
 
-    // ================= ĐẶT PHÒNG =================
+
     void datPhong() {
         int row = tblPhong.getSelectedRow();
         if (row == -1) {
@@ -231,7 +230,7 @@ public class MainForm extends JFrame {
         }
     }
 
-    // ================= SỬA / XÓA =================
+
     void suaPhong() {
         int row = tblPhong.getSelectedRow();
         if (row == -1) return;
