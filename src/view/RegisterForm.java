@@ -24,11 +24,30 @@ public class RegisterForm extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
-    void register(){
-        if(new UserDAO().register(u.getText(),
-            new String(p.getPassword()))){
-            JOptionPane.showMessageDialog(this,"Đăng ký thành công");
+    void register() {
+        
+        String username = u.getText().trim();
+        String password = new String(p.getPassword()).trim();
+
+        
+        if (username.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập tên đăng nhập!");
+            u.requestFocus(); 
+            return; 
+        }
+
+        if (password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập mật khẩu!");
+            p.requestFocus(); 
+            return;
+        }
+
+        
+        if (new UserDAO().register(username, password)) {
+            JOptionPane.showMessageDialog(this, "Đăng ký thành công");
             dispose();
-        } else JOptionPane.showMessageDialog(this,"Lỗi đăng ký");
+        } else {
+            JOptionPane.showMessageDialog(this, "Lỗi đăng ký (Tài khoản có thể đã tồn tại)");
+        }
     }
 }

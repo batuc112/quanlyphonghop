@@ -16,7 +16,7 @@ public class MainForm extends JFrame {
 
     JComboBox<Integer> cbNgay, cbThang, cbBDGio, cbBDPhut, cbKTGio, cbKTPhut;
     JTextField txtNam;
-    JButton btnDat;
+    JButton btnDat,btnLogout;
 
 
     String role, username;
@@ -100,7 +100,10 @@ public class MainForm extends JFrame {
         add(btnDat);
 
         btnDat.addActionListener(e -> datPhong());
-
+btnLogout = new JButton("Đăng xuất");
+            btnLogout.setBounds(150,600, 110, 30); 
+            add(btnLogout);
+            btnLogout.addActionListener(e -> dangXuat());
 
         if (role.equals("admin")) {
             JButton btnThem = new JButton("Thêm phòng");
@@ -269,5 +272,17 @@ public class MainForm extends JFrame {
     f.setContentPane(new BaoCaoForm());
     f.setVisible(true);
 }
+ void dangXuat() {
+        int confirm = JOptionPane.showConfirmDialog(
+                this, 
+                "Bạn có chắc chắn muốn đăng xuất không?", 
+                "Xác nhận", 
+                JOptionPane.YES_NO_OPTION
+        );
 
+        if (confirm == JOptionPane.YES_OPTION) {
+            this.dispose(); 
+            new LoginForm().setVisible(true); 
+        }
+    } 
 }
