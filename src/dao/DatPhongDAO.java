@@ -12,24 +12,14 @@ public class DatPhongDAO {
             String username
     ) {
 
-        if (username == null || username.isEmpty()) {
-            System.out.println("❌ USERNAME NULL");
-            return false;
-        }
+        String checkSql =
+            "SELECT COUNT(*) FROM datphong " +
+            "WHERE ma_phong = ? AND ngay = ? " +
+            "AND gio_bat_dau < ? AND gio_ket_thuc > ?";
 
-        String checkSql = """
-            SELECT COUNT(*) 
-            FROM datphong
-            WHERE ma_phong = ?
-              AND ngay = ?
-              AND gio_bat_dau < ?
-              AND gio_ket_thuc > ?
-        """;
-
-        String insertSql = """
-            INSERT INTO datphong(ma_phong, username, ngay, gio_bat_dau, gio_ket_thuc)
-            VALUES (?, ?, ?, ?, ?)
-        """;
+        String insertSql =
+            "INSERT INTO datphong(ma_phong, username, ngay, gio_bat_dau, gio_ket_thuc) " +
+            "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection c = DBConnection.getConnection()) {
 
@@ -44,8 +34,7 @@ public class DatPhongDAO {
             rs.next();
 
             if (rs.getInt(1) > 0) {
-                System.out.println("❌ TRÙNG LỊCH");
-                return false;
+                return false; // TRÙNG THẬT
             }
 
             // ===== INSERT =====
@@ -57,8 +46,6 @@ public class DatPhongDAO {
             ps.setTime(5, gioKT);
 
             ps.executeUpdate();
-            System.out.println("✅ ĐẶT PHÒNG THÀNH CÔNG");
-
             return true;
 
         } catch (Exception e) {
@@ -66,4 +53,20 @@ public class DatPhongDAO {
             return false;
         }
     }
+    public boolean phongDaCoLich(String maPhong) {
+    String sql = "SELECT COUNT(*) FROM datphong WHERE ma_phong = ?";
+    try (Connection c = DBConnection.getConnection();
+         PreparedStatement ps = c.prepareStatement(sql)) {
+
+        ps.setString(1, maPhong);
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return rs.getInt(1) > 0;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return true;
+    }
+}
+
 }

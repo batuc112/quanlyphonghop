@@ -14,7 +14,8 @@ public class MainForm extends JFrame {
     DefaultTableModel modelPhong;
 
     JTextField txtNgay;
-    JComboBox<String> cbBD, cbKT;
+    JComboBox<Integer> cbBDGio, cbBDPhut;
+    JComboBox<Integer> cbKTGio, cbKTPhut;
     JButton btnDat, btnSua, btnXoa;
 
     String role;
@@ -24,8 +25,8 @@ public class MainForm extends JFrame {
         this.role = role;
         this.username = username;
 
-        setTitle("Quản lý phòng họp - " + role);
-        setSize(900, 600);
+        setTitle("Quản lý phòng họp - " + role + " (" + username + ")");
+        setSize(950, 600);
         setLocationRelativeTo(null);
         setLayout(null);
 
@@ -35,56 +36,64 @@ public class MainForm extends JFrame {
         );
         tblPhong = new JTable(modelPhong);
         JScrollPane sp = new JScrollPane(tblPhong);
-        sp.setBounds(20, 20, 840, 200);
+        sp.setBounds(20, 20, 900, 220);
         add(sp);
 
         loadPhong();
 
-        // ===== KHU ĐẶT PHÒNG =====
+        // ===== ĐẶT PHÒNG =====
         JLabel lbNgay = new JLabel("Ngày (yyyy-mm-dd)");
-        lbNgay.setBounds(20, 240, 200, 25);
+        lbNgay.setBounds(20, 260, 180, 25);
         add(lbNgay);
 
         txtNgay = new JTextField();
-        txtNgay.setBounds(230, 240, 200, 25);
+        txtNgay.setBounds(200, 260, 200, 25);
         add(txtNgay);
 
         JLabel lbBD = new JLabel("Giờ bắt đầu");
-        lbBD.setBounds(20, 280, 200, 25);
+        lbBD.setBounds(20, 300, 180, 25);
         add(lbBD);
 
+        cbBDGio = new JComboBox<>();
+        cbBDPhut = new JComboBox<>();
+
+        for (int h = 7; h <= 22; h++) cbBDGio.addItem(h);
+        for (int p = 0; p < 60; p += 15) cbBDPhut.addItem(p);
+
+        cbBDGio.setBounds(200, 300, 60, 25);
+        cbBDPhut.setBounds(270, 300, 60, 25);
+        add(cbBDGio);
+        add(cbBDPhut);
+
         JLabel lbKT = new JLabel("Giờ kết thúc");
-        lbKT.setBounds(20, 320, 200, 25);
+        lbKT.setBounds(20, 340, 180, 25);
         add(lbKT);
 
-        cbBD = new JComboBox<>();
-        cbKT = new JComboBox<>();
+        cbKTGio = new JComboBox<>();
+        cbKTPhut = new JComboBox<>();
 
-        // khung giờ 07:00 → 22:00
-        for (int h = 7; h <= 22; h++) {
-            cbBD.addItem(String.format("%02d:00:00", h));
-            cbKT.addItem(String.format("%02d:00:00", h));
-        }
+        for (int h = 7; h <= 22; h++) cbKTGio.addItem(h);
+        for (int p = 0; p < 60; p += 15) cbKTPhut.addItem(p);
 
-        cbBD.setBounds(230, 280, 120, 25);
-        cbKT.setBounds(230, 320, 120, 25);
-
-        add(cbBD);
-        add(cbKT);
+        cbKTGio.setBounds(200, 340, 60, 25);
+        cbKTPhut.setBounds(270, 340, 60, 25);
+        add(cbKTGio);
+        add(cbKTPhut);
 
         btnDat = new JButton("Đặt phòng");
-        btnDat.setBounds(400, 290, 150, 35);
+        btnDat.setBounds(420, 300, 150, 40);
         add(btnDat);
 
         btnDat.addActionListener(e -> datPhong());
 
         // ===== ADMIN =====
         if (role.equals("admin")) {
+
             btnSua = new JButton("Sửa phòng");
             btnXoa = new JButton("Xóa phòng");
 
-            btnSua.setBounds(600, 240, 120, 30);
-            btnXoa.setBounds(600, 280, 120, 30);
+            btnSua.setBounds(600, 260, 140, 35);
+            btnXoa.setBounds(600, 310, 140, 35);
 
             add(btnSua);
             add(btnXoa);
@@ -99,7 +108,7 @@ public class MainForm extends JFrame {
             them.addActionListener(e -> new ThemPhongForm(this).setVisible(true));
 
             JMenuItem bc = new JMenuItem("Báo cáo");
-            bc.addActionListener(e -> new BaoCaoForm().setVisible(true));
+            bc.addActionListener(e -> moBaoCao());
 
             menu.add(them);
             menu.add(bc);
@@ -118,8 +127,9 @@ public class MainForm extends JFrame {
         }
     }
 
-    // ===== ĐẶT PHÒNG (FIX TRÙNG) =====
+    // ===== ĐẶT PHÒNG =====
     void datPhong() {
+
         int row = tblPhong.getSelectedRow();
         if (row == -1) {
             JOptionPane.showMessageDialog(this, "Chọn phòng trước");
@@ -130,11 +140,21 @@ public class MainForm extends JFrame {
             String maPhong = tblPhong.getValueAt(row, 0).toString();
             Date ngay = Date.valueOf(txtNgay.getText());
 
-            Time gioBD = Time.valueOf(cbBD.getSelectedItem().toString());
-            Time gioKT = Time.valueOf(cbKT.getSelectedItem().toString());
+            Time gioBD = Time.valueOf(
+                    String.format("%02d:%02d:00",
+                            cbBDGio.getSelectedItem(),
+                            cbBDPhut.getSelectedItem())
+            );
+
+            Time gioKT = Time.valueOf(
+                    String.format("%02d:%02d:00",
+                            cbKTGio.getSelectedItem(),
+                            cbKTPhut.getSelectedItem())
+            );
 
             if (!gioKT.after(gioBD)) {
-                JOptionPane.showMessageDialog(this, "Giờ kết thúc phải sau giờ bắt đầu");
+                JOptionPane.showMessageDialog(this,
+                        "Giờ kết thúc phải sau giờ bắt đầu");
                 return;
             }
 
@@ -144,7 +164,8 @@ public class MainForm extends JFrame {
 
             JOptionPane.showMessageDialog(
                     this,
-                    ok ? "Đặt phòng thành công" : "Trùng lịch, phòng đã có người đặt"
+                    ok ? "Đặt phòng thành công"
+                       : "Trùng lịch, phòng đã có người đặt"
             );
 
         } catch (Exception e) {
@@ -160,15 +181,25 @@ public class MainForm extends JFrame {
             return;
         }
 
+        String ma = tblPhong.getValueAt(row, 0).toString();
+
+        if (new DatPhongDAO().phongDaCoLich(ma)) {
+            JOptionPane.showMessageDialog(this,
+                    "Phòng đã có lịch, không được sửa");
+            return;
+        }
+
         try {
-            String ma = tblPhong.getValueAt(row, 0).toString();
             String ten = JOptionPane.showInputDialog("Tên phòng mới");
-            int suc = Integer.parseInt(JOptionPane.showInputDialog("Sức chứa"));
-            double gia = Double.parseDouble(JOptionPane.showInputDialog("Giá"));
+            int suc = Integer.parseInt(
+                    JOptionPane.showInputDialog("Sức chứa"));
+            double gia = Double.parseDouble(
+                    JOptionPane.showInputDialog("Giá"));
 
             new PhongHopDAO().suaPhong(ma, ten, suc, gia);
             loadPhong();
             JOptionPane.showMessageDialog(this, "Đã sửa phòng");
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Dữ liệu không hợp lệ");
         }
@@ -184,16 +215,29 @@ public class MainForm extends JFrame {
 
         String ma = tblPhong.getValueAt(row, 0).toString();
 
+        if (new DatPhongDAO().phongDaCoLich(ma)) {
+            JOptionPane.showMessageDialog(this,
+                    "Phòng đã có lịch, không được xóa");
+            return;
+        }
+
         if (JOptionPane.showConfirmDialog(
-                this,
-                "Xóa phòng này?",
+                this, "Xóa phòng này?",
                 "Xác nhận",
                 JOptionPane.YES_NO_OPTION
         ) == JOptionPane.YES_OPTION) {
 
             new PhongHopDAO().xoaPhong(ma);
             loadPhong();
-            JOptionPane.showMessageDialog(this, "Đã xóa phòng");
         }
+    }
+
+    // ===== BÁO CÁO =====
+    void moBaoCao() {
+        JFrame f = new JFrame("Báo cáo");
+        f.setSize(800, 500);
+        f.setLocationRelativeTo(this);
+        f.setContentPane(new BaoCaoForm());
+        f.setVisible(true);
     }
 }

@@ -7,7 +7,7 @@ public class DBConnection {
             Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/quanlyphonghop",
-                "root","123456789");
+                "root","123456");
         } catch(Exception e){ e.printStackTrace(); }
         return null;
     }
