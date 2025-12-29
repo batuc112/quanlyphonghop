@@ -10,85 +10,96 @@ import java.sql.Time;
 
 public class MainForm extends JFrame {
 
-    JTable table;
-    JTextField txtNgay, txtBD, txtKT;
+    JTable tblPhong;
+    DefaultTableModel modelPhong;
+
+    JTextField txtNgay;
+    JComboBox<String> cbBD, cbKT;
     JButton btnDat, btnSua, btnXoa;
 
     String role;
+    String username;
 
-    public MainForm(String role) {
+    public MainForm(String role, String username) {
         this.role = role;
+        this.username = username;
 
         setTitle("Quản lý phòng họp - " + role);
-        setSize(900,500);
+        setSize(900, 600);
         setLocationRelativeTo(null);
         setLayout(null);
 
-    
-        DefaultTableModel model = new DefaultTableModel(
-            new String[]{"Mã phòng","Tên phòng","Sức chứa","Giá"},0
+        // ===== BẢNG PHÒNG =====
+        modelPhong = new DefaultTableModel(
+                new String[]{"Mã phòng", "Tên phòng", "Sức chứa", "Giá"}, 0
         );
-        table = new JTable(model);
-        JScrollPane sp = new JScrollPane(table);
-        sp.setBounds(20,20,840,200);
+        tblPhong = new JTable(modelPhong);
+        JScrollPane sp = new JScrollPane(tblPhong);
+        sp.setBounds(20, 20, 840, 200);
         add(sp);
 
         loadPhong();
 
-  
+        // ===== KHU ĐẶT PHÒNG =====
         JLabel lbNgay = new JLabel("Ngày (yyyy-mm-dd)");
-        JLabel lbBD   = new JLabel("Giờ bắt đầu (hh:mm:ss)");
-        JLabel lbKT   = new JLabel("Giờ kết thúc (hh:mm:ss)");
-
-        lbNgay.setBounds(20,250,200,25);
-        lbBD.setBounds(20,280,200,25);
-        lbKT.setBounds(20,310,200,25);
+        lbNgay.setBounds(20, 240, 200, 25);
+        add(lbNgay);
 
         txtNgay = new JTextField();
-        txtBD   = new JTextField();
-        txtKT   = new JTextField();
+        txtNgay.setBounds(230, 240, 200, 25);
+        add(txtNgay);
 
-        txtNgay.setBounds(230,250,200,25);
-        txtBD.setBounds(230,280,200,25);
-        txtKT.setBounds(230,310,200,25);
+        JLabel lbBD = new JLabel("Giờ bắt đầu");
+        lbBD.setBounds(20, 280, 200, 25);
+        add(lbBD);
+
+        JLabel lbKT = new JLabel("Giờ kết thúc");
+        lbKT.setBounds(20, 320, 200, 25);
+        add(lbKT);
+
+        cbBD = new JComboBox<>();
+        cbKT = new JComboBox<>();
+
+        // khung giờ 07:00 → 22:00
+        for (int h = 7; h <= 22; h++) {
+            cbBD.addItem(String.format("%02d:00:00", h));
+            cbKT.addItem(String.format("%02d:00:00", h));
+        }
+
+        cbBD.setBounds(230, 280, 120, 25);
+        cbKT.setBounds(230, 320, 120, 25);
+
+        add(cbBD);
+        add(cbKT);
 
         btnDat = new JButton("Đặt phòng");
-        btnDat.setBounds(460,280,150,30);
-
-        add(lbNgay); add(lbBD); add(lbKT);
-        add(txtNgay); add(txtBD); add(txtKT);
+        btnDat.setBounds(400, 290, 150, 35);
         add(btnDat);
 
         btnDat.addActionListener(e -> datPhong());
 
-
+        // ===== ADMIN =====
         if (role.equals("admin")) {
-
             btnSua = new JButton("Sửa phòng");
             btnXoa = new JButton("Xóa phòng");
 
-            btnSua.setBounds(650,250,120,30);
-            btnXoa.setBounds(650,290,120,30);
+            btnSua.setBounds(600, 240, 120, 30);
+            btnXoa.setBounds(600, 280, 120, 30);
 
             add(btnSua);
             add(btnXoa);
 
-     
             btnSua.addActionListener(e -> suaPhong());
-
-        
             btnXoa.addActionListener(e -> xoaPhong());
 
-        
             JMenuBar bar = new JMenuBar();
             JMenu menu = new JMenu("Admin");
 
             JMenuItem them = new JMenuItem("Thêm phòng");
-            them.addActionListener(e -> new ThemPhongForm().setVisible(true));
+            them.addActionListener(e -> new ThemPhongForm(this).setVisible(true));
 
             JMenuItem bc = new JMenuItem("Báo cáo");
-            bc.addActionListener(e -> moBaoCao());
-
+            bc.addActionListener(e -> new BaoCaoForm().setVisible(true));
 
             menu.add(them);
             menu.add(bc);
@@ -99,82 +110,90 @@ public class MainForm extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-
+    // ===== LOAD PHÒNG =====
     void loadPhong() {
-        DefaultTableModel m = (DefaultTableModel) table.getModel();
-        m.setRowCount(0);
+        modelPhong.setRowCount(0);
         for (String[] p : new PhongHopDAO().getAllPhong()) {
-            m.addRow(p);
+            modelPhong.addRow(p);
         }
     }
 
-
-  void datPhong() {
-    int row = table.getSelectedRow();
-    if (row == -1) {
-        JOptionPane.showMessageDialog(this,"Chọn phòng trước");
-        return;
-    }
-
-    String ma = table.getValueAt(row,0).toString();
-    new DatPhongForm(ma);
-}
-
-
-   
-    void suaPhong() {
-        int row = table.getSelectedRow();
+    // ===== ĐẶT PHÒNG (FIX TRÙNG) =====
+    void datPhong() {
+        int row = tblPhong.getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this,"Chọn phòng cần sửa");
+            JOptionPane.showMessageDialog(this, "Chọn phòng trước");
             return;
         }
 
         try {
-            String ma  = table.getValueAt(row,0).toString();
-            String ten = JOptionPane.showInputDialog("Tên phòng mới");
-            int suc    = Integer.parseInt(
-                JOptionPane.showInputDialog("Sức chứa")
-            );
-            double gia = Double.parseDouble(
-                JOptionPane.showInputDialog("Giá")
+            String maPhong = tblPhong.getValueAt(row, 0).toString();
+            Date ngay = Date.valueOf(txtNgay.getText());
+
+            Time gioBD = Time.valueOf(cbBD.getSelectedItem().toString());
+            Time gioKT = Time.valueOf(cbKT.getSelectedItem().toString());
+
+            if (!gioKT.after(gioBD)) {
+                JOptionPane.showMessageDialog(this, "Giờ kết thúc phải sau giờ bắt đầu");
+                return;
+            }
+
+            boolean ok = new DatPhongDAO().datPhong(
+                    maPhong, ngay, gioBD, gioKT, username
             );
 
-            new PhongHopDAO().suaPhong(ma,ten,suc,gia);
-            loadPhong();
-            JOptionPane.showMessageDialog(this," Đã sửa phòng");
+            JOptionPane.showMessageDialog(
+                    this,
+                    ok ? "Đặt phòng thành công" : "Trùng lịch, phòng đã có người đặt"
+            );
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,"Dữ liệu không hợp lệ");
+            JOptionPane.showMessageDialog(this, "Dữ liệu không hợp lệ");
         }
     }
 
-
-    void xoaPhong() {
-        int row = table.getSelectedRow();
+    // ===== SỬA PHÒNG =====
+    void suaPhong() {
+        int row = tblPhong.getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this,"Chọn phòng cần xóa");
+            JOptionPane.showMessageDialog(this, "Chọn phòng cần sửa");
             return;
         }
 
-        String ma = table.getValueAt(row,0).toString();
+        try {
+            String ma = tblPhong.getValueAt(row, 0).toString();
+            String ten = JOptionPane.showInputDialog("Tên phòng mới");
+            int suc = Integer.parseInt(JOptionPane.showInputDialog("Sức chứa"));
+            double gia = Double.parseDouble(JOptionPane.showInputDialog("Giá"));
+
+            new PhongHopDAO().suaPhong(ma, ten, suc, gia);
+            loadPhong();
+            JOptionPane.showMessageDialog(this, "Đã sửa phòng");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Dữ liệu không hợp lệ");
+        }
+    }
+
+    // ===== XÓA PHÒNG =====
+    void xoaPhong() {
+        int row = tblPhong.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Chọn phòng cần xóa");
+            return;
+        }
+
+        String ma = tblPhong.getValueAt(row, 0).toString();
 
         if (JOptionPane.showConfirmDialog(
-            this,
-            "Xóa phòng này?",
-            "Xác nhận",
-            JOptionPane.YES_NO_OPTION
+                this,
+                "Xóa phòng này?",
+                "Xác nhận",
+                JOptionPane.YES_NO_OPTION
         ) == JOptionPane.YES_OPTION) {
 
             new PhongHopDAO().xoaPhong(ma);
             loadPhong();
-            JOptionPane.showMessageDialog(this,"Đã xóa phòng");
+            JOptionPane.showMessageDialog(this, "Đã xóa phòng");
         }
     }
-    void moBaoCao() {
-        JFrame f = new JFrame("Báo cáo");
-        f.setSize(800, 500);
-        f.setLocationRelativeTo(this);
-        f.setContentPane(new BaoCaoForm());
-        f.setVisible(true);
-    }
-    
 }

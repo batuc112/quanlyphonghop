@@ -4,44 +4,66 @@ import java.sql.*;
 
 public class DatPhongDAO {
 
-    public boolean datPhong(String ma, Date ngay, Time bd, Time kt) {
+    public boolean datPhong(
+            String maPhong,
+            Date ngay,
+            Time gioBD,
+            Time gioKT,
+            String username
+    ) {
 
-        String checkSQL =
-            "SELECT COUNT(*) FROM datphong " +
-            "WHERE ma_phong=? AND ngay=? " +
-            "AND ( (? < gio_ket_thuc) AND (? > gio_bat_dau) )";
+        if (username == null || username.isEmpty()) {
+            System.out.println("❌ USERNAME NULL");
+            return false;
+        }
 
-        String insertSQL =
-            "INSERT INTO datphong(ma_phong,ngay,gio_bat_dau,gio_ket_thuc) " +
-            "VALUES (?,?,?,?)";
+        String checkSql = """
+            SELECT COUNT(*) 
+            FROM datphong
+            WHERE ma_phong = ?
+              AND ngay = ?
+              AND gio_bat_dau < ?
+              AND gio_ket_thuc > ?
+        """;
+
+        String insertSql = """
+            INSERT INTO datphong(ma_phong, username, ngay, gio_bat_dau, gio_ket_thuc)
+            VALUES (?, ?, ?, ?, ?)
+        """;
 
         try (Connection c = DBConnection.getConnection()) {
 
-            // check trùng
-            PreparedStatement ps = c.prepareStatement(checkSQL);
-            ps.setString(1, ma);
-            ps.setDate(2, ngay);
-            ps.setTime(3, bd);
-            ps.setTime(4, kt);
+            // ===== CHECK TRÙNG =====
+            PreparedStatement psCheck = c.prepareStatement(checkSql);
+            psCheck.setString(1, maPhong);
+            psCheck.setDate(2, ngay);
+            psCheck.setTime(3, gioKT);
+            psCheck.setTime(4, gioBD);
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.next() && rs.getInt(1) > 0) {
-                return false; // TRÙNG
+            ResultSet rs = psCheck.executeQuery();
+            rs.next();
+
+            if (rs.getInt(1) > 0) {
+                System.out.println("❌ TRÙNG LỊCH");
+                return false;
             }
 
-            // insert
-            ps = c.prepareStatement(insertSQL);
-            ps.setString(1, ma);
-            ps.setDate(2, ngay);
-            ps.setTime(3, bd);
-            ps.setTime(4, kt);
+            // ===== INSERT =====
+            PreparedStatement ps = c.prepareStatement(insertSql);
+            ps.setString(1, maPhong);
+            ps.setString(2, username);
+            ps.setDate(3, ngay);
+            ps.setTime(4, gioBD);
+            ps.setTime(5, gioKT);
+
             ps.executeUpdate();
+            System.out.println("✅ ĐẶT PHÒNG THÀNH CÔNG");
 
             return true;
 
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 }

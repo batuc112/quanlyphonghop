@@ -3,14 +3,20 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/hhhhh/src/quanlyphonghop/Quanlyphonghop.java</file>
-            <file>file:/D:/hhhhh/src/view/BaoCaoForm.java</file>
-            <file>file:/D:/hhhhh/src/view/DatPhongForm.java</file>
-            <file>file:/D:/hhhhh/src/view/LoginForm.java</file>
-            <file>file:/D:/hhhhh/src/view/ThemPhongForm.java</file>
-            <file>file:/D:/hhhhh/src/view/MainForm.java</file>
-            <file>file:/D:/hhhhh/src/view/RegisterForm.java</file>
-            <file>file:/D:/hhhhh/src/dao/PhongHopDAO.java</file>
+            <file>file:/D:/quanlyphonghop/src/dao/BaoCaoDAO.java</file>
+            <file>file:/D:/quanlyphonghop/src/dao/DatPhongDAO.java</file>
+            <file>file:/D:/quanlyphonghop/src/dao/PhongHopDAO.java</file>
+            <file>file:/D:/quanlyphonghop/src/dao/UserDAO.java</file>
+            <file>file:/D:/quanlyphonghop/src/dao/DBConnection.java</file>
+            <file>file:/D:/quanlyphonghop/src/quanlyphonghop/Quanlyphonghop.java</file>
+            <file>file:/D:/quanlyphonghop/src/view/BaoCaoForm.java</file>
+            <file>file:/D:/quanlyphonghop/src/view/DatPhongForm.java</file>
+            <file>file:/D:/quanlyphonghop/src/view/LoginForm.java</file>
+            <file>file:/D:/quanlyphonghop/src/view/MainForm.java</file>
+            <file>file:/D:/quanlyphonghop/src/view/RegisterForm.java</file>
+            <file>file:/D:/quanlyphonghop/src/view/ThemPhongForm.java</file>
+            <file>file:/D:/quanlyphonghop/src/view/LichPhongForm.java</file>
+            <file>file:/D:/quanlyphonghop/src/view/LichCaNhanForm.java</file>
         </group>
     </open-files>
 </project-private>

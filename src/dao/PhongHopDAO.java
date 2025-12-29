@@ -60,4 +60,20 @@ public class PhongHopDAO {
             return ps.executeUpdate() > 0;
         } catch(Exception e){return false;}
     }
+    public boolean tonTaiMaPhong(String ma) {
+    String sql = "SELECT COUNT(*) FROM phonghop WHERE ma_phong = ?";
+    try (Connection c = DBConnection.getConnection();
+         PreparedStatement ps = c.prepareStatement(sql)) {
+
+        ps.setString(1, ma);
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return rs.getInt(1) > 0;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return true;
+}
+
 }

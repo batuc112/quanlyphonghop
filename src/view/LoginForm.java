@@ -37,17 +37,18 @@ public class LoginForm extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    void login() {
-        String role = new UserDAO().login(
-            u.getText(),
-            new String(p.getPassword())
-        );
+   void login() {
+    String username = u.getText();
+    String password = new String(p.getPassword());
 
-        if (role != null) {
-            new MainForm(role).setVisible(true);
-            dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "Sai tài khoản");
-        }
+    String role = new UserDAO().login(username, password);
+
+    if (role != null) {
+        new MainForm(role, username).setVisible(true);
+        dispose();
+    } else {
+        JOptionPane.showMessageDialog(this, "Sai tài khoản hoặc mật khẩu");
     }
+}
+
 }

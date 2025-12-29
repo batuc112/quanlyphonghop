@@ -10,7 +10,11 @@ public class ThemPhongForm extends JFrame {
     JTextField txtSuc = new JTextField();
     JTextField txtGia = new JTextField();
 
-    public ThemPhongForm() {
+    MainForm parent;
+
+    public ThemPhongForm(MainForm parent) {
+        this.parent = parent;
+
         setTitle("Thêm phòng (Admin)");
         setSize(350,300);
         setLayout(null);
@@ -36,22 +40,41 @@ public class ThemPhongForm extends JFrame {
         btn.addActionListener(e -> themPhong());
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        
+        setVisible(true);
     }
 
     void themPhong() {
         try {
-            new PhongHopDAO().themPhong(
-                txtMa.getText(),
-                txtTen.getText(),
-                Integer.parseInt(txtSuc.getText()),
-                Double.parseDouble(txtGia.getText())
-            );
-            JOptionPane.showMessageDialog(this, "Thêm phòng thành công");
+            String ma = txtMa.getText().trim();
+            String ten = txtTen.getText().trim();
+
+            if (ma.isEmpty() || ten.isEmpty()) {
+                JOptionPane.showMessageDialog(this,"Không được để trống");
+                return;
+            }
+
+            int suc = Integer.parseInt(txtSuc.getText());
+            double gia = Double.parseDouble(txtGia.getText());
+
+            PhongHopDAO dao = new PhongHopDAO();
+
+            if (dao.tonTaiMaPhong(ma)) {
+                JOptionPane.showMessageDialog(this,"Mã phòng đã tồn tại");
+                return;
+            }
+
+            dao.themPhong(ma, ten, suc, gia);
+
+            JOptionPane.showMessageDialog(this,"Thêm phòng thành công");
+
+            parent.loadPhong(); // refresh bảng
             dispose();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Dữ liệu không hợp lệ");
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this,"Sức chứa và giá phải là số");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,"Lỗi thêm phòng");
+            e.printStackTrace();
         }
     }
-    
 }
