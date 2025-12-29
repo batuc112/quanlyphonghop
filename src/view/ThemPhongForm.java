@@ -68,7 +68,7 @@ public class ThemPhongForm extends JFrame {
 
             JOptionPane.showMessageDialog(this,"Thêm phòng thành công");
 
-            parent.loadPhong(); // refresh bảng
+            parent.loadPhong();
             dispose();
 
         } catch (NumberFormatException e) {

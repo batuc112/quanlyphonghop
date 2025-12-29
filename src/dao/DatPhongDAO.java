@@ -15,14 +15,15 @@ public class DatPhongDAO {
         String checkSql =
             "SELECT COUNT(*) FROM datphong " +
             "WHERE ma_phong = ? AND ngay = ? " +
+            "AND trang_thai='chua_thanh_toan' "+
             "AND gio_bat_dau < ? AND gio_ket_thuc > ?";
 
         String getGiaSql =
             "SELECT gia FROM phonghop WHERE ma_phong = ?";
 
         String insertSql =
-            "INSERT INTO datphong(ma_phong, username, ngay, gio_bat_dau, gio_ket_thuc, tien) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
+            "INSERT INTO datphong(ma_phong, username, ngay, gio_bat_dau, gio_ket_thuc, tien, trang_thai) " +
+            "VALUES (?, ?, ?, ?, ?, ?, 'chua_thanh_toan')";
 
         try (Connection c = DBConnection.getConnection()) {
 
@@ -70,7 +71,7 @@ public class DatPhongDAO {
 
  
     public boolean phongDaCoLich(String maPhong) {
-        String sql = "SELECT COUNT(*) FROM datphong WHERE ma_phong = ?";
+        String sql = "SELECT COUNT(*) FROM datphong WHERE ma_phong = ? AND trang_thai='chua_thanh_toan' ";
         try (Connection c = DBConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
@@ -86,9 +87,9 @@ public class DatPhongDAO {
     }
     public ResultSet lichTheoPhong(String maPhong) {
     String sql = """
-        SELECT ngay, gio_bat_dau, gio_ket_thuc, username
+        SELECT ngay, gio_bat_dau, gio_ket_thuc, username, trang_thai
         FROM datphong
-        WHERE ma_phong = ?
+        WHERE ma_phong = ? AND trang_thai='chua_thanh_toan'
         ORDER BY ngay, gio_bat_dau
     """;
 
@@ -106,9 +107,9 @@ public class DatPhongDAO {
     try {
         Connection c = DBConnection.getConnection();
         String sql = """
-            SELECT id, ma_phong, ngay, gio_bat_dau, gio_ket_thuc
+            SELECT id, ma_phong, ngay, gio_bat_dau, gio_ket_thuc, trang_thai
             FROM datphong
-            WHERE username = ?
+            WHERE username = ? AND trang_thai='chua_thanh_toan'
             ORDER BY ngay DESC
         """;
         PreparedStatement ps = c.prepareStatement(sql);

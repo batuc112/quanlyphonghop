@@ -75,8 +75,10 @@ public class MainForm extends JFrame {
         cbKTGio = new JComboBox<>();
         cbKTPhut = new JComboBox<>();
 
-        for (int i = 7; i <= 22; i++) {
+        for (int i = 6; i <= 21; i++) {
             cbBDGio.addItem(i);
+        } 
+        for (int i = 6; i <= 23; i++) {
             cbKTGio.addItem(i);
         }
         for (int i = 0; i < 60; i += 15) {
@@ -100,10 +102,11 @@ public class MainForm extends JFrame {
         add(btnDat);
 
         btnDat.addActionListener(e -> datPhong());
+        
         btnLogout = new JButton("Đăng xuất");
-            btnLogout.setBounds(150,600, 110, 30); 
-            add(btnLogout);
-            btnLogout.addActionListener(e -> dangXuat());
+        btnLogout.setBounds(150,600, 110, 30); 
+        add(btnLogout);
+        btnLogout.addActionListener(e -> dangXuat());
        
 
         if (role.equals("admin")) {
@@ -164,7 +167,9 @@ public class MainForm extends JFrame {
 
         try {
             while (rs.next()) {
+                
                 modelLich.addRow(new Object[]{
+                       
                         rs.getDate("ngay"),
                         rs.getTime("gio_bat_dau"),
                         rs.getTime("gio_ket_thuc"),
@@ -181,7 +186,9 @@ public class MainForm extends JFrame {
 
         try {
             while (rs.next()) {
+                
                 modelLich.addRow(new Object[]{
+                      
                         rs.getDate("ngay"),
                         rs.getTime("gio_bat_dau"),
                         rs.getTime("gio_ket_thuc"),

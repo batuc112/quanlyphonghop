@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.*;
 
 public class KeToanForm extends JFrame {
-
+    JButton btnLogout;
     JTable tblLich, tblSP;
     DefaultTableModel modelLich, modelSP;
     JComboBox<String> cbSP;
@@ -29,7 +29,12 @@ public class KeToanForm extends JFrame {
         add(sp1);
 
         loadLich();
-
+        
+        
+        btnLogout = new JButton("Đăng xuất");
+        btnLogout.setBounds(20, 330, 110, 30); 
+        add(btnLogout);
+        
         cbSP = new JComboBox<>();
         loadSP();
         cbSP.setBounds(450,30,200,25);
@@ -40,8 +45,12 @@ public class KeToanForm extends JFrame {
         add(txtSL);
 
         JButton btnAdd = new JButton("Thêm");
-        btnAdd.setBounds(720,30,80,25);
+        btnAdd.setBounds(720,30,70,25);
         add(btnAdd);
+        
+        JButton btnXoaSP = new JButton("Xóa");
+        btnXoaSP.setBounds(800, 30, 70, 25);
+        add(btnXoaSP);
 
         modelSP = new DefaultTableModel(
             new String[]{"ID","Tên","SL","Tiền"},0
@@ -50,7 +59,7 @@ public class KeToanForm extends JFrame {
         JScrollPane sp2 = new JScrollPane(tblSP);
         sp2.setBounds(450,70,400,200);
         add(sp2);
-
+        
         lbTong = new JLabel("Tổng tiền: 0");
         lbTong.setBounds(450,290,300,30);
         add(lbTong);
@@ -58,10 +67,12 @@ public class KeToanForm extends JFrame {
         JButton btnTT = new JButton("Thanh toán");
         btnTT.setBounds(600,330,200,40);
         add(btnTT);
-
+        tblLich.getSelectionModel().addListSelectionListener(e -> {tinhTong();});
         btnAdd.addActionListener(e -> themSP());
         btnTT.addActionListener(e -> thanhToan());
-
+        btnLogout.addActionListener(e -> dangXuat());
+        btnXoaSP.addActionListener(e -> xoaSP());
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
     }
 
@@ -108,18 +119,19 @@ public class KeToanForm extends JFrame {
     }
 
     void tinhTong() {
-        int row = tblLich.getSelectedRow();
-        if (row == -1) return;
+    int row = tblLich.getSelectedRow();
+    if (row == -1) return;
 
-        double tienPhong = (double) modelLich.getValueAt(row,4);
-        double tienSP = 0;
+    double tienPhong = (double) modelLich.getValueAt(row,4);
+    double tienSP = 0;
 
-        for (int i=0;i<modelSP.getRowCount();i++) {
-            tienSP += (double) modelSP.getValueAt(i,3);
-        }
-
-        lbTong.setText("Tổng tiền: " + (tienPhong + tienSP));
+    for (int i=0;i<modelSP.getRowCount();i++) {
+        tienSP += (double) modelSP.getValueAt(i,3);
     }
+
+    lbTong.setText("Tổng tiền: " + (tienPhong + tienSP));
+}
+
 
     void thanhToan() {
         int row = tblLich.getSelectedRow();
@@ -154,4 +166,26 @@ public class KeToanForm extends JFrame {
             lbTong.setText("Tổng tiền: 0");
         }
     }
+    void dangXuat() {
+        int confirm = JOptionPane.showConfirmDialog(
+                this, 
+                "Bạn có chắc chắn muốn đăng xuất không?", 
+                "Xác nhận", 
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            this.dispose(); 
+            new LoginForm().setVisible(true); 
+        }
+    }
+    void xoaSP(){
+    int row = tblSP.getSelectedRow();
+    if (row != -1) {
+        modelSP.removeRow(row);
+        tinhTong();
+    }
+}
+   
+
 }

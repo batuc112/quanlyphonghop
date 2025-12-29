@@ -5,7 +5,6 @@ import java.util.List;
 
 public class KeToanDAO {
 
-    // ===== LỊCH CHƯA THANH TOÁN =====
     public ResultSet lichChuaThanhToan() {
         try {
             Connection c = DBConnection.getConnection();
@@ -22,7 +21,6 @@ public class KeToanDAO {
         }
     }
 
-    // ===== THANH TOÁN =====
     public boolean thanhToan(
         int datPhongId,
         String username,
@@ -41,7 +39,6 @@ public class KeToanDAO {
                 tong += (double) o[3];
             }
 
-            // ---- HÓA ĐƠN ----
             PreparedStatement psHD = c.prepareStatement(
                 "INSERT INTO hoadon(username, ma_phong, ngay, tong_tien) VALUES (?,?,?,?)",
                 Statement.RETURN_GENERATED_KEYS
@@ -56,7 +53,6 @@ public class KeToanDAO {
             rs.next();
             int hoaDonId = rs.getInt(1);
 
-            // ---- CHI TIẾT ----
             PreparedStatement psCT = c.prepareStatement(
                 "INSERT INTO hoadon_chitiet(hoadon_id, sanpham_id, so_luong, thanh_tien) VALUES (?,?,?,?)"
             );
@@ -70,9 +66,8 @@ public class KeToanDAO {
             }
             psCT.executeBatch();
 
-            // ---- CẬP NHẬT TRẠNG THÁI ----
             PreparedStatement psUpd = c.prepareStatement(
-              "DELETE FROM datphong WHERE id=?"
+                "UPDATE datphong SET trang_thai='da_thanh_toan' WHERE id=?"
             );
             psUpd.setInt(1, datPhongId);
             psUpd.executeUpdate();
@@ -80,9 +75,7 @@ public class KeToanDAO {
             c.commit();
             return true;
 
-        }
-        
-        catch (Exception e) {
+        } catch (Exception e) {
             try { if (c != null) c.rollback(); } catch (Exception ignored) {}
             e.printStackTrace();
             return false;
