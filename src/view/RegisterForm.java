@@ -11,8 +11,8 @@ public class RegisterForm extends JFrame {
         setSize(300,200);
         setLayout(null);
 
-        add(new JLabel("User")).setBounds(20,30,60,25);
-        add(new JLabel("Pass")).setBounds(20,70,60,25);
+        add(new JLabel("Tài khoản")).setBounds(20,30,60,25);
+        add(new JLabel("Mật khẩu")).setBounds(20,70,60,25);
         u.setBounds(80,30,150,25);
         p.setBounds(80,70,150,25);
 

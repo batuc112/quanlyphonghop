@@ -100,10 +100,11 @@ public class MainForm extends JFrame {
         add(btnDat);
 
         btnDat.addActionListener(e -> datPhong());
-btnLogout = new JButton("Đăng xuất");
+        btnLogout = new JButton("Đăng xuất");
             btnLogout.setBounds(150,600, 110, 30); 
             add(btnLogout);
             btnLogout.addActionListener(e -> dangXuat());
+       
 
         if (role.equals("admin")) {
             JButton btnThem = new JButton("Thêm phòng");

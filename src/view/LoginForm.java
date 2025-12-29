@@ -1,54 +1,74 @@
 package view;
 
 import javax.swing.*;
-import dao.UserDAO;
+import dao.DBConnection;
 
 public class LoginForm extends JFrame {
-
-    JTextField u = new JTextField();
-    JPasswordField p = new JPasswordField();
+    JTextField txtUser;
+    JPasswordField txtPass;
+    JButton btnLogin, btnRegister;
 
     public LoginForm() {
         setTitle("Đăng nhập");
         setSize(300,200);
         setLayout(null);
+        setLocationRelativeTo(null);
 
-        JLabel lb1 = new JLabel("User");
-        JLabel lb2 = new JLabel("Pass");
+        add(new JLabel("Tài khoản")).setBounds(20,20,80,25);
+        txtUser = new JTextField();
+        txtUser.setBounds(100,20,150,25);
+        add(txtUser);
 
-        lb1.setBounds(20,30,60,25);
-        lb2.setBounds(20,70,60,25);
-        u.setBounds(80,30,150,25);
-        p.setBounds(80,70,150,25);
+        add(new JLabel("Mật khẩu")).setBounds(20,60,80,25);
+        txtPass = new JPasswordField();
+        txtPass.setBounds(100,60,150,25);
+        add(txtPass);
 
-        JButton btnLogin = new JButton("Login");
-        btnLogin.setBounds(160,110,80,30);
+        btnLogin = new JButton("Đăng nhập");
+        btnLogin.setBounds(160,110,110,30);
+        add(btnLogin);
 
-        JButton btnReg = new JButton("Đăng ký");
-        btnReg.setBounds(40,110,90,30);
 
-        add(lb1); add(lb2);
-        add(u); add(p);
-        add(btnLogin); add(btnReg);
+        btnRegister = new JButton("Đăng ký");
+        btnRegister.setBounds(20,110,110,30);
+        add(btnRegister);
 
         btnLogin.addActionListener(e -> login());
-        btnReg.addActionListener(e -> new RegisterForm().setVisible(true));
+        btnRegister.addActionListener(e -> {
+            new RegisterForm().setVisible(true);
+        });
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setVisible(true);
     }
 
-   void login() {
-    String username = u.getText();
-    String password = new String(p.getPassword());
+    void login() {
+        String username = txtUser.getText().trim();
+        String password = new String(txtPass.getPassword()).trim();
 
-    String role = new UserDAO().login(username, password);
+        try (var c = DBConnection.getConnection()) {
+            var ps = c.prepareStatement(
+                "SELECT role FROM users WHERE username=? AND password=?"
+            );
+            ps.setString(1, username);
+            ps.setString(2, password);
+            var rs = ps.executeQuery();
 
-    if (role != null) {
-        new MainForm(role, username).setVisible(true);
-        dispose();
-    } else {
-        JOptionPane.showMessageDialog(this, "Sai tài khoản hoặc mật khẩu");
+            if (rs.next()) {
+                String role = rs.getString("role");
+                dispose();
+
+                if (role.equals("ketoan")) {
+                    new KeToanForm();
+                } else {
+                    new MainForm(role, username);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this,"Sai username hoặc password");
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
-}
-
 }
