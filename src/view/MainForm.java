@@ -114,29 +114,45 @@ public class MainForm extends JFrame {
             JButton btnSua = new JButton("Sửa phòng");
             JButton btnXoa = new JButton("Xóa phòng");
             JButton btnBaoCao = new JButton("Báo cáo");
+            JButton btnQLSupport = new JButton("Quản lý yêu cầu");
             
+            btnQLSupport.setBounds(760, 540, 220, 30);
             btnThem.setBounds(760, 320, 220, 30);
             btnSua.setBounds(760, 360, 220, 30);
             btnXoa.setBounds(760, 400, 220, 30);
             btnBaoCao.setBounds(760, 500, 220, 30);
-
+            
+            add(btnQLSupport);
             add(btnBaoCao);
             add(btnThem); add(btnSua); add(btnXoa);
-
+            
+            btnQLSupport.addActionListener(e -> {new QuanLyYeuCauForm();});
             btnThem.addActionListener(e -> new ThemPhongForm(this).setVisible(true));
             btnSua.addActionListener(e -> suaPhong());
             btnXoa.addActionListener(e -> xoaPhong());
             btnBaoCao.addActionListener(e -> moBaoCao());
         }
-
-
+        
+        if (role.equals("user")) {
+        
+        JButton btnSupport = new JButton("Yêu cầu hỗ trợ");
+        JButton btnLichSu = new JButton("Lịch sử yêu cầu");
+        
+        btnSupport.setBounds(760, 500, 220, 30);
+        btnLichSu.setBounds(760, 540, 220, 30);
+        
+        add(btnSupport);
+        add(btnLichSu);
+        
+        btnSupport.addActionListener(e -> {new SupportForm(username);});
+        btnLichSu.addActionListener(e -> new LichSuYeuCauForm(username));}
+        
         JButton btnMy = new JButton("Lịch của tôi");
         btnMy.setBounds(760, 460, 220, 30);
         add(btnMy);
 
-        btnMy.addActionListener(e -> new LichCaNhanForm(username)
-);
-
+        btnMy.addActionListener(e -> new LichCaNhanForm(username));
+       
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
