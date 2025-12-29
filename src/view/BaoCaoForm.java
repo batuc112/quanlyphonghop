@@ -4,66 +4,53 @@ import dao.BaoCaoDAO;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.util.Vector;
+import java.sql.ResultSet;
 
 public class BaoCaoForm extends JPanel {
 
     JTable table;
-    JComboBox<Integer> cbThang;
-    JLabel lblTong;
-
-    BaoCaoDAO dao = new BaoCaoDAO();
+    JLabel lbTong;
 
     public BaoCaoForm() {
         setLayout(null);
 
-        JLabel lbThang = new JLabel("Chọn tháng:");
-        lbThang.setBounds(20, 20, 100, 25);
-        add(lbThang);
+        DefaultTableModel model = new DefaultTableModel(
+            new String[]{"Mã phòng", "Tên phòng", "Số lần", "Tổng giờ", "Doanh thu"}, 0
+        );
 
-        cbThang = new JComboBox<>();
-        for (int i = 1; i <= 12; i++) cbThang.addItem(i);
-        cbThang.setBounds(120, 20, 100, 25);
-        add(cbThang);
-
-        JButton btnXem = new JButton("Xem báo cáo");
-        btnXem.setBounds(240, 20, 130, 25);
-        add(btnXem);
-
-  
-        table = new JTable();
+        table = new JTable(model);
         JScrollPane sp = new JScrollPane(table);
-        sp.setBounds(20, 60, 740, 300);
+        sp.setBounds(20, 20, 740, 300);
         add(sp);
 
-  
-        lblTong = new JLabel("Tổng doanh thu: 0");
-        lblTong.setBounds(20, 380, 400, 25);
-        add(lblTong);
+        lbTong = new JLabel("Tổng doanh thu: 0");
+        lbTong.setBounds(20, 340, 400, 30);
+        add(lbTong);
 
- 
-        btnXem.addActionListener(e -> loadBaoCao());
-
- 
         loadBaoCao();
     }
 
     void loadBaoCao() {
-        int thang = (int) cbThang.getSelectedItem();
+        DefaultTableModel m = (DefaultTableModel) table.getModel();
+        m.setRowCount(0);
 
-        DefaultTableModel model = new DefaultTableModel(
-                dao.getHeader(), 0
-        );
+        BaoCaoDAO dao = new BaoCaoDAO();
+        ResultSet rs = dao.baoCaoPhong();
 
-        Vector<Vector<Object>> data = dao.BaoCaoThang(thang);
-
-        for (Vector<Object> row : data) {
-            model.addRow(row);
+        try {
+            while (rs.next()) {
+                m.addRow(new Object[]{
+                    rs.getString("ma_phong"),
+                    rs.getString("ten_phong"),
+                    rs.getInt("so_lan_su_dung"),
+                    rs.getDouble("tong_gio_su_dung"),
+                    rs.getDouble("doanh_thu")
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        table.setModel(model);
-
-        double tong = dao.DoanhThuThang(thang);
-        lblTong.setText("Tổng doanh thu tháng " + thang + ": " + tong);
+        lbTong.setText("Tổng doanh thu: " + dao.tongDoanhThu());
     }
 }
