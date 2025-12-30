@@ -1,8 +1,9 @@
+
 package view;
 
 import javax.swing.*;
 import java.awt.*;
-import dao.UserDAO;
+import dao.DBConnection;
 
 public class LoginForm extends JFrame {
 
@@ -90,21 +91,36 @@ public class LoginForm extends JFrame {
         btnReg.addActionListener(e -> new RegisterForm().setVisible(true));
     }
 
-    void login() {
-String username = u.getText().trim();
+      void login() {
+        String username = u.getText().trim();
         String password = new String(p.getPassword()).trim();
 
-        String role = new UserDAO().login(username, password);
+        try (var c = DBConnection.getConnection()) {
+            var ps = c.prepareStatement(
+                "SELECT role FROM users WHERE username=? AND password=?"
+            );
+            ps.setString(1, username);
+            ps.setString(2, password);
+            var rs = ps.executeQuery();
 
-        if (role != null) {
-            new MainForm(role, username).setVisible(true);
-            dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "Sai tài khoản hoặc mật khẩu!");
+            if (rs.next()) {
+                String role = rs.getString("role");
+                dispose();
+
+                if (role.equals("ketoan")) {
+                    new KeToanForm();
+                } else {
+                    new MainForm(role, username);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this,"Sai username hoặc password");
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+
+
+
         }
-    }
-
-    public static void main(String[] args) {
-        new LoginForm().setVisible(true);
     }
 }

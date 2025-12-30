@@ -59,7 +59,7 @@ public class RegisterForm extends JFrame {
             JOptionPane.showMessageDialog(this, "Đăng ký thành công");
             dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Lỗi đăng ký (Tài khoản có thể đã tồn tại)");
+            JOptionPane.showMessageDialog(this, "Tài khoản đã tồn tại");
         }
     }
 

@@ -3,6 +3,9 @@ package view;
 import dao.DatPhongDAO;
 import dao.PhongHopDAO;
 
+import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
@@ -85,6 +88,9 @@ public class MainForm extends JFrame {
             cbBDPhut.addItem(i);
             cbKTPhut.addItem(i);
         }
+        
+        cbThang.addActionListener(e -> capNhatNgay());
+        txtNam.addActionListener(e -> capNhatNgay());
 
         add(new JLabel("Bắt đầu")).setBounds(760, 100, 100, 25);
         cbBDGio.setBounds(760, 130, 60, 25);
@@ -216,46 +222,53 @@ public class MainForm extends JFrame {
 
 
     void datPhong() {
-        int row = tblPhong.getSelectedRow();
-        if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Chọn phòng");
+    int row = tblPhong.getSelectedRow();
+    if (row == -1) {
+        JOptionPane.showMessageDialog(this, "Chọn phòng");
+        return;
+    }
+
+    try {
+        String ma = tblPhong.getValueAt(row, 0).toString();
+        int nam = Integer.parseInt(txtNam.getText().trim());
+        int thang = (int) cbThang.getSelectedItem();
+        int ngay = (int) cbNgay.getSelectedItem();
+
+        Date ngayDat = Date.valueOf(nam + "-" + thang + "-" + ngay);
+
+        Time bd = Time.valueOf(String.format("%02d:%02d:00",
+                cbBDGio.getSelectedItem(),
+                cbBDPhut.getSelectedItem()));
+
+        Time kt = Time.valueOf(String.format("%02d:%02d:00",
+                cbKTGio.getSelectedItem(),
+                cbKTPhut.getSelectedItem()));
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate dateCheck = ngayDat.toLocalDate();
+        LocalTime timeCheck = bd.toLocalTime();
+
+        if (dateCheck.isBefore(now.toLocalDate()) ||
+            (dateCheck.isEqual(now.toLocalDate()) && timeCheck.isBefore(now.toLocalTime()))) {
+            JOptionPane.showMessageDialog(this, "Thời gian đặt phải lớn hơn hiện tại!");
             return;
         }
 
-        try {
-            String ma = tblPhong.getValueAt(row, 0).toString();
-            Date ngay = Date.valueOf(
-                    txtNam.getText() + "-" +
-                            cbThang.getSelectedItem() + "-" +
-                            cbNgay.getSelectedItem()
-            );
+        boolean ok = new DatPhongDAO().datPhong(ma, ngayDat, bd, kt, username);
 
-            Time bd = Time.valueOf(
-                    String.format("%02d:%02d:00",
-                            cbBDGio.getSelectedItem(),
-                            cbBDPhut.getSelectedItem())
-            );
+        JOptionPane.showMessageDialog(this,
+                ok ? "Đặt phòng thành công" : "Trùng lịch");
 
-            Time kt = Time.valueOf(
-                    String.format("%02d:%02d:00",
-                            cbKTGio.getSelectedItem(),
-                            cbKTPhut.getSelectedItem())
-            );
-
-            boolean ok = new DatPhongDAO().datPhong(ma, ngay, bd, kt, username);
-
-            JOptionPane.showMessageDialog(this,
-                    ok ? "Đặt phòng thành công" : "Trùng lịch");
-
-            if (ok) {
-                loadPhong();
-                loadLichPhong();
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Dữ liệu không hợp lệ");
+        if (ok) {
+            loadPhong();
+            loadLichPhong();
         }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Dữ liệu không hợp lệ");
     }
+}
+
 
 
     void suaPhong() {
@@ -309,4 +322,42 @@ public class MainForm extends JFrame {
             new LoginForm().setVisible(true); 
         }
     } 
+ void capNhatNgay() {
+    int thang = (int) cbThang.getSelectedItem();
+    int nam;
+    try {
+        nam = Integer.parseInt(txtNam.getText().trim());
+    } catch (Exception e) {
+        nam = LocalDate.now().getYear();
+    }
+
+    int soNgay;
+
+    switch (thang) {
+        case 2:
+            if ((nam % 4 == 0 && nam % 100 != 0) || (nam % 400 == 0)) {
+                soNgay = 29;
+            } else {
+                soNgay = 28;
+            }
+            break;
+        case 4: case 6: case 9: case 11:
+            soNgay = 30;
+            break;
+        default:
+            soNgay = 31;
+            break;
+    }
+
+    Integer selected = (Integer) cbNgay.getSelectedItem();
+    cbNgay.removeAllItems();
+    for (int i = 1; i <= soNgay; i++) {
+        cbNgay.addItem(i);
+    }
+
+    if (selected != null && selected <= soNgay) {
+        cbNgay.setSelectedItem(selected);
+    }
+}
+
 }
