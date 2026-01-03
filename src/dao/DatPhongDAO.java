@@ -16,7 +16,7 @@ public class DatPhongDAO {
             "SELECT COUNT(*) FROM datphong " +
             "WHERE ma_phong = ? AND ngay = ? " +
             "AND trang_thai='chua_thanh_toan' "+
-            "AND gio_bat_dau < ? AND gio_ket_thuc > ?";
+            "AND gio_bat_dau <= ? AND gio_ket_thuc >= ?";
 
         String getGiaSql =
             "SELECT gia FROM phonghop WHERE ma_phong = ?";

@@ -261,6 +261,11 @@ public class MainForm extends JFrame {
             JOptionPane.showMessageDialog(this, "Thời gian đặt không hợp lệ!");
             return;
         }
+        if (!kt.after(bd)) {
+            JOptionPane.showMessageDialog(this,"Thời gian đặt không hợp lệ!");
+            return;
+}
+
 
         boolean ok = new DatPhongDAO().datPhong(ma, ngayDat, bd, kt, username);
 
