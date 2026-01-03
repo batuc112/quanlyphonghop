@@ -122,23 +122,23 @@ public class DatPhongDAO {
 }
 
 
-public boolean huyDatPhong(int id, String username) {
-    String sql = """
-        DELETE FROM datphong
-        WHERE id = ? AND username = ?
-    """;
+    public boolean huyDatPhong(int id, String username) {
+        String sql = """
+            DELETE FROM datphong
+            WHERE id = ? AND username = ?
+        """;
 
-    try (Connection c = DBConnection.getConnection();
-         PreparedStatement ps = c.prepareStatement(sql)) {
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
 
-        ps.setInt(1, id);
-        ps.setString(2, username);
-        return ps.executeUpdate() > 0;
+            ps.setInt(1, id);
+            ps.setString(2, username);
+            return ps.executeUpdate() > 0;
 
-    } catch (Exception e) {
-        e.printStackTrace();
-        return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 
 }

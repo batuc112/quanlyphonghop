@@ -116,12 +116,18 @@ public class MainForm extends JFrame {
        
 
         if (role.equals("admin")) {
+            JButton btnQLLich = new JButton("Quản lý lịch đặt");
+
+
+
+
             JButton btnThem = new JButton("Thêm phòng");
             JButton btnSua = new JButton("Sửa phòng");
             JButton btnXoa = new JButton("Xóa phòng");
             JButton btnBaoCao = new JButton("Báo cáo");
             JButton btnQLSupport = new JButton("Quản lý yêu cầu");
             
+            btnQLLich.setBounds(760, 460, 220, 30);
             btnQLSupport.setBounds(760, 540, 220, 30);
             btnThem.setBounds(760, 320, 220, 30);
             btnSua.setBounds(760, 360, 220, 30);
@@ -131,12 +137,14 @@ public class MainForm extends JFrame {
             add(btnQLSupport);
             add(btnBaoCao);
             add(btnThem); add(btnSua); add(btnXoa);
+            add(btnQLLich);
             
             btnQLSupport.addActionListener(e -> {new QuanLyYeuCauForm();});
             btnThem.addActionListener(e -> new ThemPhongForm(this).setVisible(true));
             btnSua.addActionListener(e -> suaPhong());
             btnXoa.addActionListener(e -> xoaPhong());
             btnBaoCao.addActionListener(e -> moBaoCao());
+            btnQLLich.addActionListener(e -> new AdminLichForm());
         }
         
         if (role.equals("user")) {
@@ -250,7 +258,7 @@ public class MainForm extends JFrame {
 
         if (dateCheck.isBefore(now.toLocalDate()) ||
             (dateCheck.isEqual(now.toLocalDate()) && timeCheck.isBefore(now.toLocalTime()))) {
-            JOptionPane.showMessageDialog(this, "Thời gian đặt phải lớn hơn hiện tại!");
+            JOptionPane.showMessageDialog(this, "Thời gian đặt không hợp lệ!");
             return;
         }
 
